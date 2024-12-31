@@ -20,6 +20,7 @@ from src.loop import NLLLoop, NLLWeightDecayLoop
 from jax import config
 config.update("jax_enable_x64", True)
 
+# https://github.com/frederikwilde/scalable-dynamical-hamiltonian-learning/blob/main/demo/plots.ipynb
 
 def run_robustness_experiment():
     n, num_states, num_times, num_paulis, shots = 6, 5, 5, 200, 100
@@ -45,7 +46,7 @@ def run_robustness_experiment():
         model = NeuralODEModel(H, key=jax.random.key(trial + 100000))
 
         # for this simple example just use a fixed learning rate instead of the curriculum learning scheme
-        schedule = 0.01
+        schedule = 0.04
 
         optimizer = optax.adam(learning_rate=schedule)
 
@@ -56,8 +57,8 @@ def run_robustness_experiment():
 
         print('Learned parameters:', model.get_hamiltonian_parameters())
 
-        loop.save_metrics(f'runs/node_{H.__class__.__name__}_{n}_{trial:03d}.pkl')
-        loop.save_model(f'runs/node_{H.__class__.__name__}_{n}_{trial:03d}.eqx')
+        loop.save_metrics(f'./runs/node_{H.__class__.__name__}_{n}_{trial:03d}.pkl')
+        loop.save_model(f'./runs/node_{H.__class__.__name__}_{n}_{trial:03d}.eqx')
 
 
 if __name__ == '__main__':

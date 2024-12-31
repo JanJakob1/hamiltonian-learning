@@ -34,7 +34,7 @@ class Hamiltonian(abc.ABC):
         """Contruct attributes of model.
 
         Args:
-            n: number of qudits
+            n: number of qubits
             ops: the operators in the Hamiltonian; each element of
                 the list must have shape (k, n), where n is the number of qudits
                 and k is the number of operators. Operators in the same
@@ -278,6 +278,7 @@ class HeteroHeisenbergHamiltonian(SU2Hamiltonian):
         pauli_ops.extend([np.array([[0] * i + [3, 3] + [0] * (n - i - 2)]) for i in range(n - 1)])
         pauli_ops.extend([np.array([[0] * i + [1] + [0] * (n - i - 1)]) for i in range(n)])
 
+        print(pauli_ops)
         super().__init__(n, pauli_ops)
 
 

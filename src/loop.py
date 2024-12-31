@@ -64,8 +64,21 @@ class Loop:
 
         plt.xlabel("Iteration")
         plt.ylabel("Parameter Values")
+        plt.title("True and learned coefficients of the Hamiltonian")
         plt.show()
 
+    def l1_error(self):
+        """
+        Return the relative L1 error
+        """
+        relative_l1_error_nom = 0
+        relative_l1_error_den = 0
+        for i in range(self.model.H.num_parameters):
+            relative_l1_error_nom += np.abs(self.metrics[f'param{i:04d}'][-1] - self.metrics[f'true_param{i:04d}'])
+            relative_l1_error_den += np.abs(self.metrics[f'true_param{i:04d}'])
+        relative_l1_error = relative_l1_error_nom / relative_l1_error_den
+        return relative_l1_error
+    
     @abc.abstractmethod
     def loss_fn(self, inputs, outputs):
         """
@@ -106,11 +119,17 @@ class Loop:
         with open(filename, 'wb') as f:
             pickle.dump(self.metrics, f)
 
+    def load_metrics(self, filename):
+        with open(filename, 'rb') as file:
+            self.metrics = pickle.load(file)
+
     def save_model(self, filename):
         eqx.tree_serialise_leaves(filename, self.model)
 
     def load_model(self, filename):
+        print(filename)
         self.model = eqx.tree_deserialise_leaves(filename, self.model)
+        print(self.model)
 
     def train(self, train_set, num_epochs, callbacks=None, **kwargs):
         """
@@ -207,7 +226,7 @@ class KLDivLoop(Loop):
         return jnp.mean(jnp.stack(kl_divs))
 
 
-class NLLWeightDecayLoop(NLLLoop):
+class NLLWeightDecayLoop(KLDivLoop):
 
     def __init__(self, model, optimizer, l2=0.1):
         super().__init__(model, optimizer)
